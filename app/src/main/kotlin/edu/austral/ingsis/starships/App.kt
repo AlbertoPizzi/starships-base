@@ -18,7 +18,7 @@ class Starships() : Application() {
     private val keyTracker = KeyTracker()
 
     companion object {
-        val STARSHIP_IMAGE_REF = ImageRef("starship", 70.0, 70.0)
+        val STARSHIP_IMAGE_REF = ImageRef("ship", 1000.0, 100.0)
     }
 
     override fun start(primaryStage: Stage) {
