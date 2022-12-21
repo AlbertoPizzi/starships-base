@@ -12,4 +12,7 @@ public interface Movable {
      String getId();
      Entity getEntity();
      double getRotation();
+
+     Movable update();
+     Position verify(Position pos);
 }

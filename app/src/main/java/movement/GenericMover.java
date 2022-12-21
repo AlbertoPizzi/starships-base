@@ -30,6 +30,11 @@ public class GenericMover implements Movable{
     }
 
     @Override
+    public Position verify(Position pos) {
+        return null;
+    }
+
+    @Override
     public double calculateSpeed() {
         return 0;
     }

@@ -1,5 +1,7 @@
 package entities;
 
+import config.Config;
+
 import java.util.Optional;
 
 public class Ship implements Entity{
@@ -8,6 +10,7 @@ public class Ship implements Entity{
     final double health;
     final double size;
     final int power;
+    final double dmg = Config.HEALTH;
 
 
     public Ship(String id, double health, double size, int power) {
@@ -29,7 +32,7 @@ public class Ship implements Entity{
 
     @Override
     public double getDamage() {
-        return 0;
+        return dmg;
     }
 
     @Override
