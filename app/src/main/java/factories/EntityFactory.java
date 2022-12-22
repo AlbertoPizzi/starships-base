@@ -1,23 +1,46 @@
 package factories;
 
 import entities.*;
-import entities.collision.BulletCollision;
-import entities.oldFiles.BulletOld;
-import entities.collision.PiercingCollision;
 import entities.collision.RegularBulletCollision;
 import movement.Position;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static config.Config.*;
 
 public class EntityFactory {
-//    public static Bullet createBullet(BulletType bulletType, String ownerId, double rotation, Position position) {
-//        return switch (bulletType) {
-//            case NORMAL -> new Bullet(ownerId, EntityIdGenerator.generateId(EntityType.BULLET) , BULLET_DMG , EntityType.BULLET , bulletType, new RegularBulletCollision(), EntityShape.ELLIPTICAL
-//                    , BULLET_SIZE, position , position)
-//            case PIERCING -> new BulletOld(bulletType, EntityIdGenerator.generateId(EntityType.BULLET), ownerId, new PiercingCollision(), BULLET_SIZE, BULLET_DMG, position, position.getX(), position.getY())
-//                    , position, Math.cos(Math.toRadians(rotation)) * BULLET_SPEED, Math.sin(Math.toRadians(rotation)) * BULLET_SPEED);
-//            case ROCKET -> new BulletOld(bulletType, EntityIdGenerator.generateId(EntityType.BULLET), ownerId, new RegularBulletCollision(), ROCKET_SIZE, ROCKET_DMG, position, position.getX(), position.getY())
-//                    , position, Math.cos(Math.toRadians(rotation)) * BULLET_SPEED / 4, Math.sin(Math.toRadians(rotation)) * BULLET_SPEED / 4);
-//        };
-//    }
+    public  Bullet createBullet(BulletType bulletType, String ownerId, double rotation, Position position) {
+        return switch (bulletType) {
+            case NORMAL -> new Bullet(ownerId, EntityIdGenerator.generateId(EntityType.BULLET) , BULLET_DMG , EntityType.BULLET , bulletType, new RegularBulletCollision(), EntityShape.ELLIPTICAL
+                    , BULLET_SIZE, position , position);
+            case ROCKET -> new Bullet(ownerId, EntityIdGenerator.generateId(EntityType.BULLET), ROCKET_DMG,EntityType.BULLET , bulletType, new RegularBulletCollision(), EntityShape.ELLIPTICAL
+                    , ROCKET_SIZE , position , position);
+        };
+    }
+    public List<Asteroid> asteroidGenerator(int amountOfAsteroids){
+        List<Asteroid> asteroids = new ArrayList<>();
+        for (int i = 0; i < amountOfAsteroids ; i++) {
+            asteroids.add(new Asteroid(EntityIdGenerator.generateId(EntityType.ASTEROID), EntityType.ASTEROID , EntityShape.ELLIPTICAL
+                    ,  randomAsteroidSize() , generateRandomPosition() , generateRandomPosition(), ASTEROID_SPEED , randomAsteroidSize(), true ));
+        }
+        return asteroids;
+    }
+
+    public Position generateRandomPosition() {
+         double random = Math.random();
+         if (random < 0.25) {
+             return new Position(0, Math.random() * WINDOW_HEIGHT);
+         } else if (random < 0.5) {
+             return new Position(WINDOW_WIDTH, Math.random() * WINDOW_HEIGHT);
+         } else if (random < 0.75) {
+             return new Position(Math.random() * WINDOW_WIDTH, 0);
+         } else {
+             return new Position(Math.random() * WINDOW_WIDTH, WINDOW_HEIGHT);
+         }
+     }
+     public double randomAsteroidSize(){
+      return (Math.random()*(MAX_ASTEROID_SIZE - MIN_ASTEROID_SIZE) + MIN_ASTEROID_SIZE);
+     }
     //TODO: Todo lo que es generator
 }

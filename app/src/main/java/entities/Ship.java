@@ -2,8 +2,12 @@ package entities;
 
 import config.Config;
 
+import factories.EntityFactory;
+import factories.EntityIdGenerator;
 import movement.Position;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class Ship implements Entity{
@@ -17,6 +21,7 @@ public class Ship implements Entity{
     final String ownerId;
     final double rotation;
     final Position direction;
+    final EntityFactory entityFactory = new EntityFactory();
 
     public Ship(String id, EntityType type, EntityShape shape, String ownerId, int health, double size, Position initPos, Position direction, double speed, double rotation) {
         this.id = id;
@@ -131,5 +136,20 @@ public class Ship implements Entity{
 
     public Position getDirection() {
         return direction;
+    }
+
+
+    public Ship rotateLeft(){
+        return rotate(-Config.ROTATION);
+    }
+    public Ship rotateRight(){
+        return rotate(Config.ROTATION);
+    }
+    public List<Bullet> shoot(int numberOfBullets){
+    List<Bullet> bullets = new ArrayList<>();
+        for (int i = 0; i < numberOfBullets; i++) {
+           bullets.add(entityFactory.createBullet(BulletType.NORMAL,getId(),getRotation(),getPosition()));
+        }
+        return bullets;
     }
 }

@@ -13,7 +13,7 @@ public class GameState {
         this.players = players;
     }
 
-    public List<Entity> getEntities() {
+    public  List<Entity> getEntities() {
         return entities;
     }
 

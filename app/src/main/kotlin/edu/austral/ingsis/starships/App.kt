@@ -9,7 +9,7 @@ import javafx.scene.input.KeyCode
 import javafx.stage.Stage
 
 fun main() {
-    launch(ApeShips::class.java)
+    launch(Starships::class.java)
 }
 
 class Starships() : Application() {
@@ -32,9 +32,9 @@ class Starships() : Application() {
         val starship = ElementModel("starship", 300.0, 300.0, 40.0, 40.0, 270.0, Triangular, STARSHIP_IMAGE_REF)
         facade.elements["starship"] = starship
 
-        facade.timeListenable.addEventListener(ApeTimeListener(facade.elements))
-        facade.collisionsListenable.addEventListener(ApeCollisionListener())
-        keyTracker.keyPressedListenable.addEventListener(ApeKeyPressedListener(starship))
+        facade.timeListenable.addEventListener(TimeListener(facade.elements))
+        facade.collisionsListenable.addEventListener(CollisionListener())
+        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(starship))
 
         val scene = Scene(facade.view)
         keyTracker.scene = scene

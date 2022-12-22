@@ -1,7 +1,7 @@
 package entities.collision;
 
 import entities.Bullet;
-import entities.oldFiles.BulletOld;
+
 import entities.Entity;
 
 import java.util.Objects;

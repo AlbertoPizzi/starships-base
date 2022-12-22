@@ -1,13 +1,12 @@
 package entities.collision;
 
 import entities.Bullet;
-import entities.oldFiles.BulletOld;
 import entities.Entity;
 
 import java.util.Objects;
 import java.util.Optional;
 
-public class PiercingCollision implements BulletCollision{
+public class RocketCollision implements BulletCollision{
     @Override
     public Optional<Entity> collide(Bullet bullet, Entity entity) {
         if(Objects.equals(entity.getId(), bullet.getOwnerId())){
