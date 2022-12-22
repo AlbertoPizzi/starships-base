@@ -1,6 +1,8 @@
 package entities;
 
 public enum BulletType {
-    NORMAL
+    NORMAL,
+    ROCKET,
+    PIERCING
 
 }

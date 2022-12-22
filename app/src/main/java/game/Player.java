@@ -1,3 +1,5 @@
+package game;
+
 public class Player {
     private final String id;
     private final int points;

@@ -18,7 +18,7 @@ public class Config {
     //Bullet config
     public static final double BULLET_SPEED = 10;
     public static final int BULLET_SIZE = 10;
-    public static final double BULLET_DMG = 15;
+    public static final int BULLET_DMG = 15;
     public static final int ROCKET_DMG = 25;
     public static final int ROCKET_SIZE = 20;
 
@@ -28,7 +28,4 @@ public class Config {
     public static final int ASTEROID_DMG = 10;
     public static final double ASTEROID_SPEED = 0.005;
     public static final double ASTEROID_SPAWN_PROB = 0.002;
-
-    //Keys
-
 }

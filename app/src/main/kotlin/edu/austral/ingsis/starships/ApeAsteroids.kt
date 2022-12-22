@@ -1,18 +1,16 @@
 package edu.austral.ingsis.starships
 
 import edu.austral.ingsis.starships.ui.*
-import edu.austral.ingsis.starships.ui.ElementColliderType.*
 import javafx.application.Application
-import javafx.application.Application.launch
 import javafx.scene.Scene
 import javafx.scene.input.KeyCode
 import javafx.stage.Stage
 
 fun main() {
-    launch(ApeShips::class.java)
+    Application.launch(ApeShips::class.java)
 }
 
-class Starships() : Application() {
+class ApeShips() : Application() {
     private val imageResolver = CachedImageResolver(DefaultImageResolver())
     private val facade = ElementsViewFacade(imageResolver)
     private val keyTracker = KeyTracker()
@@ -23,13 +21,13 @@ class Starships() : Application() {
 
     override fun start(primaryStage: Stage) {
         facade.elements["asteroid-1"] =
-            ElementModel("asteroid-1", 0.0, 0.0, 30.0, 40.0, 0.0, Elliptical, null)
+            ElementModel("asteroid-1", 0.0, 0.0, 30.0, 40.0, 0.0, ElementColliderType.Elliptical, null)
         facade.elements["asteroid-2"] =
-            ElementModel("asteroid-2", 100.0, 100.0, 30.0, 20.0, 90.0, Rectangular, null)
+            ElementModel("asteroid-2", 100.0, 100.0, 30.0, 20.0, 90.0, ElementColliderType.Rectangular, null)
         facade.elements["asteroid-3"] =
-            ElementModel("asteroid-3", 200.0, 200.0, 20.0, 30.0, 180.0, Elliptical, null)
+            ElementModel("asteroid-3", 200.0, 200.0, 20.0, 30.0, 180.0, ElementColliderType.Elliptical, null)
 
-        val starship = ElementModel("starship", 300.0, 300.0, 40.0, 40.0, 270.0, Triangular, STARSHIP_IMAGE_REF)
+        val starship = ElementModel("starship", 300.0, 300.0, 40.0, 40.0, 270.0, ElementColliderType.Triangular, STARSHIP_IMAGE_REF)
         facade.elements["starship"] = starship
 
         facade.timeListenable.addEventListener(ApeTimeListener(facade.elements))
@@ -54,7 +52,7 @@ class Starships() : Application() {
     }
 }
 
-class TimeListener(private val elements: Map<String, ElementModel>) : EventListener<TimePassed> {
+class ApeTimeListener(private val elements: Map<String, ElementModel>) : EventListener<TimePassed> {
     override fun handle(event: TimePassed) {
         elements.forEach {
             val (key, element) = it
@@ -75,22 +73,21 @@ class TimeListener(private val elements: Map<String, ElementModel>) : EventListe
     }
 }
 
-class CollisionListener() : EventListener<Collision> {
+class ApeCollisionListener() : EventListener<Collision> {
     override fun handle(event: Collision) {
         println("${event.element1Id} ${event.element2Id}")
     }
 
 }
 
-class KeyPressedListener(private val starship: ElementModel): EventListener<KeyPressed> {
+class ApeKeyPressedListener(private val starship: ElementModel): EventListener<KeyPressed> {
     override fun handle(event: KeyPressed) {
-        when(event.key) {
-            KeyCode.UP -> starship.y.set(starship.y.value - 5 )
+        when (event.key) {
+            KeyCode.UP -> starship.y.set(starship.y.value - 5)
             KeyCode.DOWN -> starship.y.set(starship.y.value + 5)
-            KeyCode.LEFT -> starship.x.set(starship.x.value - 5 )
-            KeyCode.RIGHT -> starship.x.set(starship.x.value + 5 )
+            KeyCode.LEFT -> starship.x.set(starship.x.value - 5)
+            KeyCode.RIGHT -> starship.x.set(starship.x.value + 5)
             else -> {}
         }
     }
-
 }
