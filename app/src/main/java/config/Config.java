@@ -14,6 +14,7 @@ public class Config {
     public static final double ROTATION = 15.0;
     public static final String SHIP_IMAGE_REF1 = "ship";
     public static final String SHIP_IMAGE_REF2 = "Xwing";
+    public static final String SHIP_IMAGE_REF3 = "starship";
 
     public static final double SHIP1_ORIGIN = 100.0;
     public static final double SHIP1_INIT_DIRECTION = 0.0;

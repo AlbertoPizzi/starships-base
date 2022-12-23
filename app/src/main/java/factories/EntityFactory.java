@@ -43,5 +43,5 @@ public class EntityFactory {
      public double randomAsteroidSize(){
       return (Math.random()*(MAX_ASTEROID_SIZE - MIN_ASTEROID_SIZE) + MIN_ASTEROID_SIZE);
      }
-    //TODO: Todo lo que es generator
+     //TODO: LAS FACTORIES
 }
