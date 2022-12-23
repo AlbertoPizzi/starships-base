@@ -5,6 +5,6 @@ public enum KeyAction {
     BACKWARD,
     ROTATE_LEFT,
     ROTATE_RIGHT,
-    SHOOT,
+    SHOOT
 
 }

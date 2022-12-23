@@ -1,0 +1,5 @@
+nbrOfPlayers:2
+livesPerPlayer:5
+amountOfAsteroids:30
+keyBoardSettings:forward-1=W;backwards-1=S;rotate-left-1=A;rotate-right-1=D;shoot-1=SPACE;forward-2=UP;backwards-2=DOWN;rotate-left-2=LEFT;rotate-right-2=RIGHT;shoot-2=ENTER;
+images:style-1=SHIP1;style-2=SHIP2

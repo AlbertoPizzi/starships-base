@@ -4,6 +4,9 @@ import movement.Position;
 
 import java.util.Optional;
 
+import static config.Config.WINDOW_HEIGHT;
+import static config.Config.WINDOW_WIDTH;
+
 public class Asteroid extends Entity{
 
     private final int deathValue;
@@ -27,6 +30,21 @@ public class Asteroid extends Entity{
             case BULLET -> Optional.of(this.setCurrentHealth(getCurrentHealth() - enemy.getDmg()));
             default -> Optional.of(this);
         };
+    }
+    public Asteroid update() {
+        if (isVisible()) {
+            if (getSpeed() > 0){
+                double newX = getPosition().getX() +  getSpeed() * getDirection().getX();
+                double newY = getPosition().getY() +  getSpeed() * getDirection().getY();
+                if (newX <= WINDOW_WIDTH && newX >= 0 && newY <= WINDOW_HEIGHT && newY >= 0){
+                    Asteroid asteroid = (Asteroid) setPosition(new Position(newX, newY));
+                    return (Asteroid) asteroid.setRotationDegrees(getRotationDegrees() + 1);
+                }else{
+                    return (Asteroid) setIsVisible(false);
+                }
+            }
+        }
+        return this;
     }
     public int getDeathValue() {
         return deathValue;

@@ -1,13 +1,26 @@
 package edu.austral.ingsis.starships
 
+import config.Config.*
 import edu.austral.ingsis.starships.ui.*
 import edu.austral.ingsis.starships.ui.ElementColliderType.*
 import entities.Asteroid
+import entities.Entity
+import entities.EntityShape
+import entities.EntityType
+import game.Game
 import javafx.application.Application
 import javafx.application.Application.launch
+import javafx.geometry.Pos
+import javafx.scene.Cursor
 import javafx.scene.Scene
 import javafx.scene.input.KeyCode
+import javafx.scene.layout.HBox
+import javafx.scene.layout.StackPane
+import javafx.scene.layout.VBox
 import javafx.stage.Stage
+import movement.Position
+
+import kotlin.system.exitProcess
 
 fun main() {
     launch(Starships::class.java)
@@ -22,82 +35,124 @@ class Starships() : Application() {
         val STARSHIP_IMAGE_REF = ImageRef("ship", 80.0, 100.0)
         val STARSHIP_IMAGE_REF2 = ImageRef("Xwing", 80.0, 100.0)
         val Asteroid_IMAGE_REF = ImageRef("farquad", 80.0, 100.0)
+        val BULLET_IMAGE_REF = ImageRef("shot" , BULLET_HEIGHT , BULLET_WIDTH)
+        val game = Game()
+        val adapter = Adapter();
     }
 
     override fun start(primaryStage: Stage) {
-        facade.elements["asteroid-1"] =
-            ElementModel("asteroid-1", 0.0, 0.0, 30.0, 40.0, 0.0, Elliptical, Asteroid_IMAGE_REF)
-        facade.elements["asteroid-2"] =
-            ElementModel("asteroid-2", 100.0, 100.0, 30.0, 20.0, 90.0, Rectangular, Asteroid_IMAGE_REF)
-        facade.elements["asteroid-3"] =
-            ElementModel("asteroid-3", 200.0, 200.0, 20.0, 30.0, 180.0, Elliptical, Asteroid_IMAGE_REF)
+        val pane = gameScene()
 
-        val starship = ElementModel("starship-1", 300.0, 300.0, 40.0, 40.0, 270.0, Elliptical, STARSHIP_IMAGE_REF2)
-        facade.elements["starship"] = starship
-        val starship2 = ElementModel("starship-2", 300.0, 300.0, 40.0, 40.0, 270.0, Triangular, STARSHIP_IMAGE_REF)
-        facade.elements["starship"] = starship
+        facade.timeListenable.addEventListener(TimeListener(facade.elements , game , this))
+        facade.collisionsListenable.addEventListener(CollisionListener(game))
+        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(game , this , primaryStage , pane ))
+        facade.showCollider.value = false;
 
-
-        facade.timeListenable.addEventListener(TimeListener(facade.elements))
-        facade.collisionsListenable.addEventListener(CollisionListener())
-        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(starship))
 
         val scene = Scene(facade.view)
         keyTracker.scene = scene
 
         primaryStage.scene = scene
-        primaryStage.height = 800.0
-        primaryStage.width = 800.0
+        primaryStage.height = WINDOW_HEIGHT
+        primaryStage.width = WINDOW_WIDTH
 
         facade.start()
         keyTracker.start()
         primaryStage.show()
+        game.start()
+        createEntities()
+
     }
 
     override fun stop() {
         facade.stop()
         keyTracker.stop()
+        exitProcess(0)
     }
-}
+    private fun gameScene(): StackPane {
+        val pane = StackPane()
+        val root = facade.view
+        root.id = "pane"
+        pane.children.addAll(root )
 
-class TimeListener(private val elements: Map<String, ElementModel>) : EventListener<TimePassed> {
-    override fun handle(event: TimePassed) {
-        elements.forEach {
-            val (key, element) = it
-            when(key) {
-                "starship" -> {}
-                "asteroid-1" -> {
-                    element.x.set(element.x.value + 0.25)
-                    element.y.set(element.y.value + 0.25)
-                }
-                else -> {
-                    element.x.set(element.x.value - 0.25)
-                    element.y.set(element.y.value - 0.25)
-                }
-            }
+        return pane
+    }
 
-            element.rotationInDegrees.set(element.rotationInDegrees.value + 1)
+    private fun createEntities(){
+        val entities = game.entities
+        for(entity in entities){
+            facade.elements[entity.id] = adapter.adaptEntity(entity)
+        }
+    }
+    fun convertShape(shape: EntityShape) : ElementColliderType {
+        return when (shape) {
+            EntityShape.ELLIPTICAL -> Elliptical
+            EntityShape.RECTANGULAR -> Rectangular
+            EntityShape.TRIANGULAR -> Triangular
         }
     }
 }
 
-class CollisionListener() : EventListener<Collision> {
+class TimeListener(private val elements: Map<String, ElementModel> , private val game: Game , private val starships: Starships) : EventListener<TimePassed> {
+    override fun handle(event: TimePassed) {
+        if (game.isOver) {
+            game.reset()
+            starships.stop()
+        }
+        game.update()
+        val entities = game.entities ?: return;
+        for (entity in entities) {
+            val element = elements.get(entity.id)
+            val values = entity.posRotSz
+            if (element != null) {
+                element.x.set(values[0])
+                element.y.set(values[1])
+                element.rotationInDegrees.set(values[2])
+                element.height.set(values[3])
+                element.width.set(values[4])
+            }
+        }
+    }
+}
+
+class CollisionListener(private val game: Game) : EventListener<Collision> {
     override fun handle(event: Collision) {
+        game.handleCollision(event.element1Id ,event.element2Id )
         println("${event.element1Id} ${event.element2Id}")
+
     }
 
 }
 
-class KeyPressedListener(private val starship: ElementModel): EventListener<KeyPressed> {
+class KeyPressedListener(private val game: Game, private val starships: Starships, private val primaryStage: Stage, private val pane: StackPane): EventListener<KeyPressed> {
     override fun handle(event: KeyPressed) {
-        when(event.key) {
-            KeyCode.UP -> starship.y.set(starship.y.value - 5 )
-            KeyCode.DOWN -> starship.y.set(starship.y.value + 5)
-            KeyCode.LEFT -> starship.x.set(starship.x.value - 5 )
-            KeyCode.RIGHT -> starship.x.set(starship.x.value + 5 )
+        val map = game.configuration.keyMap;
+        when (event.key) {
+            map["forward-1"] -> game.moveShip(0, Position(0.0, -1.0))
+            map["backwards-1"] -> game.moveShip(0, Position(0.0, 1.0))
+//            map["left-1"] -> game.moveShip(0, Position(-1.0, 0.0))
+//            map["right-1"] -> game.moveShip(0, Position(1.0, 0.0))
+            map["stop-1"] -> game.moveShip(0, Position(0.0, 0.0))
+            map["rotate-left-1"] -> game.rotateShip(0, -5.0)
+            map["rotate-right-1"] -> game.rotateShip(0, 5.0)
+            map["shoot-1"] -> game.shoot(0)
+
             else -> {}
         }
+        if (game.players.size == 2) {
+            when (event.key) {
+                map["forward-2"] -> game.moveShip(1, Position(0.0, -1.0))
+                map["backwards-2"] -> game.moveShip(1, Position(0.0, 1.0))
+//                map["left-2"] -> game.moveShip(1, Position(-1.0, 0.0))
+//                map["right-2"] -> game.moveShip(1, Position(1.0, 0.0))
+                map["stop-2"] -> game.moveShip(1, Position(0.0, 0.0))
+                map["rotate-left-2"] -> game.rotateShip(1, -5.0)
+                map["rotate-right-2"] -> game.rotateShip(1, 5.0)
+                map["shoot-2"] -> game.shoot(1)
+
+                else -> {}
+            }
+        }
     }
 
 }
-//TODO: ADAPT TO UI

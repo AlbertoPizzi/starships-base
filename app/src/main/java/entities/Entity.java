@@ -2,7 +2,7 @@ package entities;
 
 import movement.Position;
 
-public class Entity {
+public  class Entity {
     private final String id;
 
     private final EntityType type;
@@ -35,7 +35,10 @@ public class Entity {
         this.currentHealth = currentHealth;
         this.dmg = dmg;
     }
-    public Entity setId(String id){
+    public Double[] getPosRotSz(){
+        return new Double[]{position.getX(), position.getY(), rotationDegrees, height, width};
+    }
+    public  Entity setId(String id){
         return new Entity(id , type , shape , height, width , position, direction, speed, rotationDegrees , dmg , isVisible, currentHealth);
     }
     public Entity setEntityType(EntityType type){
@@ -72,6 +75,7 @@ public class Entity {
     public Entity setIsVisible(boolean isVisible){
         return new Entity(id , type , shape , height, width , position, direction, speed, rotationDegrees , dmg , isVisible, currentHealth);
     }
+
 
     public String getId() {
         return id;

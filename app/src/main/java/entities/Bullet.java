@@ -1,10 +1,11 @@
 package entities;
 
-import factories.EntityIdGenerator;
 import movement.Position;
 
 import java.util.Optional;
-import static config.Config.*;
+
+import static config.Config.WINDOW_HEIGHT;
+import static config.Config.WINDOW_WIDTH;
 
 public class Bullet extends Entity{
     private final String shipId;
@@ -21,6 +22,21 @@ public class Bullet extends Entity{
                 getPosition().getY() - (getDirection().getX() * Math.cos(Math.toRadians(getDirection().getY())) * transition  * 50)
         );
         return this.setPosition(newPos);
+    }
+    public Bullet update() {
+        if (isVisible()) {
+            if (getSpeed() > 0){
+                double newX = getPosition().getX() +  getSpeed() * getDirection().getX();
+                double newY = getPosition().getY() +  getSpeed() * getDirection().getY();
+                //Solo se mueve dentro de la pantalla
+                if (newX <= WINDOW_WIDTH && newX >= 0 && newY <= WINDOW_HEIGHT && newY >= 0){
+                    return setPosition(new Position(newX, newY));
+                }else{
+                    return setVisible(false);
+                }
+            }
+        }
+        return this;
     }
     public Optional<Entity> collide(Entity enemy){
         return switch (enemy.getType()) {

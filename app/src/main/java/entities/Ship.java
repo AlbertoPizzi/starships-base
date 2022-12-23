@@ -19,10 +19,20 @@ public class Ship extends Entity{
         this.shotsFired = shotsFired;
     }
 
-    public Entity move(double transition){
+    public Ship update() {
+        if (getSpeed() > 0){
+            double newX = getPosition().getX() +  getSpeed() * getDirection().getX();
+            double newY = getPosition().getY() +  getSpeed() * getDirection().getY();
+            if (newX < 720 && newX > 0 && newY < 700 && newY > 0) {
+                return (Ship) setPosition(new Position(newX, newY));
+            }
+        }
+        return this;
+    }
+    public Entity move(Position direction){
         Position newPos = new Position(
-                getPosition().getX() - (getDirection().getX() * -Math.sin(Math.toRadians(getDirection().getY())) * transition * 50),
-                getPosition().getY() - (getDirection().getX() * Math.cos(Math.toRadians(getDirection().getY())) * transition  * 50)
+                getPosition().getX() - (getDirection().getX() * -Math.sin(Math.toRadians(getDirection().getY())) * direction.getY() * 50),
+                getPosition().getY() - (getDirection().getX() * Math.cos(Math.toRadians(getDirection().getY())) * direction.getY()  * 50)
         );
         return this.setPosition(newPos);
     }
