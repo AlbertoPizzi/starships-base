@@ -1,125 +1,61 @@
 package entities;
 
-import config.Config;
-import entities.collision.BulletCollision;
+import factories.EntityIdGenerator;
 import movement.Position;
 
 import java.util.Optional;
+import static config.Config.*;
 
-public class Bullet implements Entity{
-
-    final String bulletID;
-    final int dmg;
-    final EntityType type;
-    final BulletType bulletType;
-    final EntityShape shape;
-    final double size;
-    final Position initPos;
-    final String ownerId;
-    final Position direction;
-    final double speed;
-    final BulletCollision bulletCollision;
-
-    public Bullet( String ownerId, String bulletID, int dmg, EntityType type, BulletType bulletType, BulletCollision bulletCollision, EntityShape shape, double size, Position initPos, Position direction) {
-
-        this.bulletID = bulletID;
-        this.dmg = dmg;
-        this.type = type;
+public class Bullet extends Entity{
+    private final String shipId;
+    private final BulletType bulletType;
+    public Bullet(String id, double height, double width, Position position, Position direction, double speed, double rotationDegrees, double dmg, boolean isVisible, double currentHealth, String shipId, BulletType bulletType) {
+        super(id, EntityType.BULLET, EntityShape.ELLIPTICAL, height, width, position, direction, speed, rotationDegrees, dmg, isVisible, currentHealth);
+        this.shipId = shipId;
         this.bulletType = bulletType;
-        this.shape = shape;
-        this.size = size;
-        this.initPos = initPos;
-        this.ownerId = ownerId;
-        this.direction = direction;
-        this.speed = Config.BULLET_SPEED;
-        this.bulletCollision = bulletCollision;
     }
 
-
-
-    public BulletType getBulletType() {
-        return bulletType;
+    public Entity move(double transition){
+        Position newPos = new Position(
+                getPosition().getX() - (getDirection().getX() * -Math.sin(Math.toRadians(getDirection().getY())) * transition * 50),
+                getPosition().getY() - (getDirection().getX() * Math.cos(Math.toRadians(getDirection().getY())) * transition  * 50)
+        );
+        return this.setPosition(newPos);
+    }
+    public Optional<Entity> collide(Entity enemy){
+        return switch (enemy.getType()) {
+            case ASTEROID -> Optional.of(this.setCurrentHealth(0.0));
+            case SHIP -> Optional.of(this);
+            case BULLET -> Optional.of(this);
+            default -> Optional.of(this);
+        };
+    }
+    public Bullet shoot(Ship ship){
+        Bullet bullet =  setDirection(ship.getDirection());
+        bullet = bullet.setVisible(true);
+        bullet = bullet.setPosition(new Position(ship.getPosition().getX()+20 , ship.getPosition().getY()));
+        return bullet;
+    }
+    public Bullet setPosition(Position position) {
+        return new Bullet(getId(),getHeight(),getWidth(),position, getDirection(), getSpeed() , getRotationDegrees(), getDmg(), isVisible(), getCurrentHealth(), shipId, bulletType);
     }
 
-    public Position getInitPos() {
-        return initPos;
+    public Bullet setDirection(Position direction) {
+        return new Bullet(getId(),getHeight(),getWidth(),getPosition(), direction, getSpeed() , getRotationDegrees(), getDmg(), isVisible(), getCurrentHealth(), shipId, bulletType);
     }
 
-    public Position getDirection() {
-        return direction;
+    public Bullet setSpeed(double speed) {
+        return new Bullet(getId(),getHeight(),getWidth(),getPosition(), getDirection(), speed , getRotationDegrees(), getDmg(), isVisible(), getCurrentHealth(), shipId, bulletType);
     }
 
-    @Override
-    public String getId() {
-        return bulletID;
+    public Bullet setRotationDegrees(double rotationDegrees) {
+        return new Bullet(getId(),getHeight(),getWidth(),getPosition(), getDirection(), getSpeed() , rotationDegrees, getDmg(), isVisible(), getCurrentHealth(), shipId, bulletType);
     }
 
-    @Override
-    public EntityType getType() {
-        return type;
+    public Bullet setVisible(boolean isVisible) {
+        return new Bullet(getId(),getHeight(),getWidth(),getPosition(), getDirection(), getSpeed() , getRotationDegrees(), getDmg(), isVisible, getCurrentHealth(), shipId, bulletType);
     }
-
-    @Override
-    public EntityShape getShape() {
-        return shape;
-    }
-
-    @Override
-    public int getDamage() {
-        return dmg;
-    }
-
-    @Override
-    public double getSpeed() {
-        return speed;
-    }
-
-    @Override
-    public Optional<Entity> collide(Entity enemy) {
-      if(bulletType == BulletType.NORMAL){
-          bulletCollision.collide(this , enemy);
-      }
-      return Optional.empty();
-    }
-
-    @Override
-    public double getSize() {
-        return size;
-    }
-
-    @Override
-    public String getOwnerId() {
-        return ownerId;
-    }
-
-    @Override
-    public Position getPosition() {
-        return initPos;
-    }
-
-    @Override
-    public Entity update() {
-        return move(true);
-    }
-
-    @Override
-    public Position verify(Position pos) {
-        return null;
-    }
-    public BulletCollision getBulletCollision(){
-        return bulletCollision;
-    }
-
-    @Override
-    public Entity move(Boolean forward) {
-        double newX = getPosition().getX() - 4 * Math.sin(Math.PI * 2 * getDirection().getX() / 360);
-        double newY = getPosition().getY() + 4 * Math.cos(Math.PI * 2 * getDirection().getY() / 360);
-        return new Bullet(getOwnerId(),getId(),getDamage(),getType(),getBulletType(), getBulletCollision(), getShape(),getSize(), new Position(newX , newY)
-                , getDirection());
-    }
-
-    @Override
-    public double getRotation() {
-        return 0;
+    public String getShipId() {
+        return shipId;
     }
 }

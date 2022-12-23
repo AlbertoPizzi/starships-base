@@ -1,155 +1,61 @@
 package entities;
 
-import config.Config;
 
-import factories.EntityFactory;
-import factories.EntityIdGenerator;
+import static config.Config.SHIP_MAX_SPEED;
+import static config.Config.SHIP_SPEED_INCREMENT;
+
+import config.Config;
 import movement.Position;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-public class Ship implements Entity{
-    final String id;
-    final EntityType type;
-    final EntityShape shape;
-    final int health;
-    final double size;
-    final Position initPos;
-    final double speed;
-    final String ownerId;
-    final double rotation;
-    final Position direction;
-    final EntityFactory entityFactory = new EntityFactory();
-
-    public Ship(String id, EntityType type, EntityShape shape, String ownerId, int health, double size, Position initPos, Position direction, double speed, double rotation) {
-        this.id = id;
-        this.type = type;
-        this.shape = shape;
-        this.health = health;
-        this.size = size;
-        this.initPos = initPos;
-        this.speed = speed;
-        this.ownerId = ownerId;
-        this.rotation = rotation;
-        this.direction = direction;
+public class Ship extends Entity{
+    private final String playerId;
+    private final int shotsFired;
+    public Ship(String id, double height, double width, Position position, Position direction
+            , double speed, double rotationDegrees, double dmg, boolean isVisible, double currentHealth, String playerId, int shotsFired) {
+        super(id, EntityType.SHIP, EntityShape.TRIANGULAR, height, width, position, direction, speed, rotationDegrees, dmg, isVisible, currentHealth);
+        this.playerId = playerId;
+        this.shotsFired = shotsFired;
     }
 
-    @Override
-    public String getId() {
-        return id;
+    public Entity move(double transition){
+        Position newPos = new Position(
+                getPosition().getX() - (getDirection().getX() * -Math.sin(Math.toRadians(getDirection().getY())) * transition * 50),
+                getPosition().getY() - (getDirection().getX() * Math.cos(Math.toRadians(getDirection().getY())) * transition  * 50)
+        );
+        return this.setPosition(newPos);
     }
-
-    @Override
-    public EntityType getType() {
-        return type;
-    }
-
-    @Override
-    public EntityShape getShape() {
-        return shape ;
-    }
-
-    @Override
-    public int getDamage() {
-        return health;
-    }
-
-    @Override
-    public double getSpeed() {
-        return speed;
-    }
-
-    @Override
-    public Optional<Entity> collide(Entity enemy) {
-        if(enemy.getType().equals(EntityType.ASTEROID)) {
-            if(enemy.getPosition().equals(initPos) && this.getDamage() - enemy.getDamage() > 0){
-                Optional.of(new Ship(getId(), getType() , getShape() , getOwnerId(), getDamage() - enemy.getDamage() , getSize() , getPosition(), getDirection(),getSpeed() , getRotation()));
-            }
-        }if(enemy.getType().equals(EntityType.BULLET) || enemy.getType().equals(EntityType.SHIP)){
-            return Optional.of(this);
-        }else{
-            return Optional.empty();
+    public Entity accelerate(){
+        if(getDirection().getX() <= SHIP_MAX_SPEED){
+            return setDirectionSpeed(getDirection().sum(SHIP_SPEED_INCREMENT));
         }
+        return this;
     }
-
-    @Override
-    public double getSize() {
-        return size;
-    }
-
-    @Override
-    public String getOwnerId() {
-        return ownerId;
-    }
-
-    @Override
-    public Position getPosition() {
-        return initPos;
-    }
-
-    @Override
-    public Entity update() {
-        if (speed > 0){
-            double newX =  (getPosition().getX() - 3.5 * Math.sin(Math.PI * 2 * getDirection().getX() / 360));
-            double newY =  (getPosition().getY() + 3.5 * Math.cos(Math.PI * 2 * getDirection().getY() / 360));
-            return new Ship(getId(), getType() , getShape() , getOwnerId() , getDamage() , getSize()
-                    , new Position(newX , newY) , getDirection() , getSpeed() - 5 , getRotation());
-        }else return new Ship(getId(),getType(),getShape(),getOwnerId(),getDamage(),getSize(),getPosition(),getDirection(),getSpeed(),getRotation());
-
-    }
-
-    @Override
-    public Position verify(Position pos) {
-        return null;
-    }
-
-    @Override
-    public Entity move(Boolean forward) {
-        if(forward){
-            return upSpeed();
+    public Entity decelerate(){
+        if(getDirection().getX() <= SHIP_MAX_SPEED){
+            return this.setDirectionSpeed(getDirection().subtract(SHIP_SPEED_INCREMENT));
         }
-        else return downSpeed();
+        return this;
     }
-    public Ship upSpeed(){
-        if(speed < 1000){
-            return new Ship(getId() , getType() , getShape() , getOwnerId() , getDamage() , getSize() , getPosition() ,getDirection() , getSpeed() + Config.SHIP_SPEED , getRotation());
-        }
-        else return this;
-    }
-    public Ship downSpeed(){
-        if(speed > 0){
-            return new Ship(getId() , getType() , getShape() , getOwnerId() , getDamage() , getSize() , getPosition() , getDirection(), getSpeed() - Config.SHIP_SPEED , getRotation());
-        }
-        else return this;
-    }
-    public Ship rotate(double rotation){
-        return new Ship(getId() , getType() , getShape() , getOwnerId() , getDamage() , getSize() , getPosition() ,getDirection() , getSpeed() , getRotation() + rotation);
+    public Optional<Entity> collide(Entity enemy){
+        return switch(enemy.getType()){
+            case ASTEROID -> Optional.of(this.setCurrentHealth( getCurrentHealth() - Config.ASTEROID_DMG * enemy.getDmg()));
+            case BULLET -> Optional.of(this);
+            case SHIP -> Optional.of(this);
+            default -> Optional.of(this);
+        };
     }
 
-
-    @Override
-    public double getRotation() {
-        return rotation;
+    public Entity rotate(double rotation){
+        return this.setRotationDegrees(rotation);
+    }
+    public String getPlayerId() {
+        return playerId;
     }
 
-    public Position getDirection() {
-        return direction;
+    public int getShotsFired() {
+        return shotsFired;
     }
 
-
-    public Ship rotateLeft(){
-        return rotate(-Config.ROTATION);
-    }
-    public Ship rotateRight(){
-        return rotate(Config.ROTATION);
-    }
-    public List<Bullet> shoot(int numberOfBullets){
-    List<Bullet> bullets = new ArrayList<>();
-        for (int i = 0; i < numberOfBullets; i++) {
-           bullets.add(entityFactory.createBullet(BulletType.NORMAL,getId(),getRotation(),getPosition()));
-        }
-        return bullets;
-    }
 }

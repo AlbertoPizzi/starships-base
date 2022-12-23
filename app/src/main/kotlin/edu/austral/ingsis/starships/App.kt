@@ -2,6 +2,7 @@ package edu.austral.ingsis.starships
 
 import edu.austral.ingsis.starships.ui.*
 import edu.austral.ingsis.starships.ui.ElementColliderType.*
+import entities.Asteroid
 import javafx.application.Application
 import javafx.application.Application.launch
 import javafx.scene.Scene
@@ -18,19 +19,24 @@ class Starships() : Application() {
     private val keyTracker = KeyTracker()
 
     companion object {
-        val STARSHIP_IMAGE_REF = ImageRef("ship", 1000.0, 100.0)
+        val STARSHIP_IMAGE_REF = ImageRef("ship", 80.0, 100.0)
+        val STARSHIP_IMAGE_REF2 = ImageRef("Xwing", 80.0, 100.0)
+        val Asteroid_IMAGE_REF = ImageRef("farquad", 80.0, 100.0)
     }
 
     override fun start(primaryStage: Stage) {
         facade.elements["asteroid-1"] =
-            ElementModel("asteroid-1", 0.0, 0.0, 30.0, 40.0, 0.0, Elliptical, null)
+            ElementModel("asteroid-1", 0.0, 0.0, 30.0, 40.0, 0.0, Elliptical, Asteroid_IMAGE_REF)
         facade.elements["asteroid-2"] =
-            ElementModel("asteroid-2", 100.0, 100.0, 30.0, 20.0, 90.0, Rectangular, null)
+            ElementModel("asteroid-2", 100.0, 100.0, 30.0, 20.0, 90.0, Rectangular, Asteroid_IMAGE_REF)
         facade.elements["asteroid-3"] =
-            ElementModel("asteroid-3", 200.0, 200.0, 20.0, 30.0, 180.0, Elliptical, null)
+            ElementModel("asteroid-3", 200.0, 200.0, 20.0, 30.0, 180.0, Elliptical, Asteroid_IMAGE_REF)
 
-        val starship = ElementModel("starship", 300.0, 300.0, 40.0, 40.0, 270.0, Triangular, STARSHIP_IMAGE_REF)
+        val starship = ElementModel("starship-1", 300.0, 300.0, 40.0, 40.0, 270.0, Elliptical, STARSHIP_IMAGE_REF2)
         facade.elements["starship"] = starship
+        val starship2 = ElementModel("starship-2", 300.0, 300.0, 40.0, 40.0, 270.0, Triangular, STARSHIP_IMAGE_REF)
+        facade.elements["starship"] = starship
+
 
         facade.timeListenable.addEventListener(TimeListener(facade.elements))
         facade.collisionsListenable.addEventListener(CollisionListener())
@@ -94,3 +100,4 @@ class KeyPressedListener(private val starship: ElementModel): EventListener<KeyP
     }
 
 }
+//TODO: ADAPT TO UI

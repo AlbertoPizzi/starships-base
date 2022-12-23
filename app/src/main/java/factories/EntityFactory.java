@@ -1,7 +1,6 @@
 package factories;
 
 import entities.*;
-import entities.collision.RegularBulletCollision;
 import movement.Position;
 
 import java.util.ArrayList;
@@ -11,20 +10,22 @@ import static config.Config.*;
 
 public class EntityFactory {
     public  Bullet createBullet(BulletType bulletType, String ownerId, double rotation, Position position) {
-        return switch (bulletType) {
-            case NORMAL -> new Bullet(ownerId, EntityIdGenerator.generateId(EntityType.BULLET) , BULLET_DMG , EntityType.BULLET , bulletType, new RegularBulletCollision(), EntityShape.ELLIPTICAL
-                    , BULLET_SIZE, position , position);
-            case ROCKET -> new Bullet(ownerId, EntityIdGenerator.generateId(EntityType.BULLET), ROCKET_DMG,EntityType.BULLET , bulletType, new RegularBulletCollision(), EntityShape.ELLIPTICAL
-                    , ROCKET_SIZE , position , position);
-        };
+//        return switch (bulletType) {
+//            case NORMAL -> new Bullet(ownerId, EntityIdGenerator.generateId(EntityType.BULLET) , BULLET_DMG , EntityType.BULLET , bulletType, new RegularBulletCollision(), EntityShape.ELLIPTICAL
+//                    , BULLET_SIZE, position , position);
+//            case ROCKET -> new Bullet(ownerId, EntityIdGenerator.generateId(EntityType.BULLET), ROCKET_DMG,EntityType.BULLET , bulletType, new RegularBulletCollision(), EntityShape.ELLIPTICAL
+//                    , ROCKET_SIZE , position , position);
+//        };
+        return null;
     }
     public List<Asteroid> asteroidGenerator(int amountOfAsteroids){
-        List<Asteroid> asteroids = new ArrayList<>();
-        for (int i = 0; i < amountOfAsteroids ; i++) {
-            asteroids.add(new Asteroid(EntityIdGenerator.generateId(EntityType.ASTEROID), EntityType.ASTEROID , EntityShape.ELLIPTICAL
-                    ,  randomAsteroidSize() , generateRandomPosition() , generateRandomPosition(), ASTEROID_SPEED , randomAsteroidSize(), true ));
-        }
-        return asteroids;
+//        List<Asteroid> asteroids = new ArrayList<>();
+//        for (int i = 0; i < amountOfAsteroids ; i++) {
+//            asteroids.add(new Asteroid(EntityIdGenerator.generateId(EntityType.ASTEROID), EntityType.ASTEROID , EntityShape.ELLIPTICAL
+//                    ,  randomAsteroidSize() , generateRandomPosition() , generateRandomPosition(), ASTEROID_SPEED , randomAsteroidSize(), true ));
+//        }
+//        return asteroids;
+        return null;
     }
 
     public Position generateRandomPosition() {

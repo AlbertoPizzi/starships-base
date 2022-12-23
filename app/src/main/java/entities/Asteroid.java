@@ -1,121 +1,34 @@
 package entities;
 
-import config.Config;
 import movement.Position;
 
 import java.util.Optional;
 
-public class Asteroid implements Entity{
-    final String id;
-    final EntityType type;
-    final EntityShape shape;
-    final double dmg;
-    final double size;
-    final Position position;
-    final Position direction;
-    final double speed;
-    final double rotation;
-    final boolean clockwise;
-    public Asteroid(String id, EntityType type, EntityShape shape, double size, Position position, Position direction, double speed , double rotation , boolean clockwise ) {
-        this.id = id;
-        this.type = type;
-        this.shape = shape;
-        this.dmg = size * Config.ASTEROID_DMG;
-        this.size = size;
-        this.position = position;
-        this.direction = direction;
-        this.speed = speed;
-        this.rotation = rotation;
-        this.clockwise = clockwise;
+public class Asteroid extends Entity{
+
+    private final int deathValue;
+    public Asteroid(String id, double height, double width, Position position
+            , Position direction, double speed, double rotationDegrees, double dmg, boolean isVisible, double currentHealth, int deathValue) {
+        super(id, EntityType.ASTEROID, EntityShape.ELLIPTICAL, height, width, position, direction, speed, rotationDegrees, dmg, isVisible, currentHealth);
+        this.deathValue = deathValue;
     }
 
-    @Override
-    public String getId() {
-        return null;
+    public Entity move(double transition) {
+        Position newPos = new Position(
+                getPosition().getX() - (getDirection().getX() * -Math.sin(Math.toRadians(getDirection().getY())) * transition * 50),
+                getPosition().getY() - (getDirection().getX() * Math.cos(Math.toRadians(getDirection().getY())) * transition * 50)
+        );
+        return this.setPosition(newPos);
     }
-
-    public Position getDirection(){
-        return direction;
+    public Optional<Entity> collide(Entity enemy){
+        return switch (enemy.getType()) {
+            case ASTEROID -> Optional.of(this);
+            case SHIP -> Optional.of(this.setCurrentHealth(0.0));
+            case BULLET -> Optional.of(this.setCurrentHealth(getCurrentHealth() - enemy.getDmg()));
+            default -> Optional.of(this);
+        };
     }
-    @Override
-    public EntityType getType() {
-        return type;
-    }
-
-    @Override
-    public EntityShape getShape() {
-        return shape;
-    }
-
-    @Override
-    public int getDamage() {
-        return (int)dmg;
-    }
-
-    @Override
-    public double getSpeed() {
-        return speed;
-    }
-
-    @Override
-    public Optional<Entity> collide(Entity enemy) {
-        if(enemy.getType().equals(EntityType.BULLET)){
-            if(size <= Config.MIN_ASTEROID_SIZE){
-                return Optional.empty();
-            }
-            else{
-                return Optional.of(new Asteroid(getId(),getType(),getShape(),getSize()- enemy.getDamage(), getPosition(),getDirection(),getSpeed(), getRotation(), getClockwise()));
-            }
-        }else {
-            return Optional.of(this);
-        }
-    }
-
-    @Override
-    public double getSize() {
-        return size;
-    }
-
-    @Override
-    public String getOwnerId() {
-        return id;
-    }
-
-    @Override
-    public Position getPosition() {
-        return position;
-    }
-
-    @Override
-    public Entity update() {
-        return new Asteroid(getId() , getType() ,getShape() ,getSize() , new Position(position.getX()+ speed , position.getY()+ speed)
-                ,getDirection(),getSpeed() - 5 , getRotation() , getClockwise()) ;
-    }
-
-    @Override
-    public Position verify(Position pos) {
-        return null;
-    }
-
-
-    @Override
-    public Entity move(Boolean forward) {
-        double newX = getPosition().getX() + 0.7 * Math.sin(Math.PI * 2 * getDirection().getX() / 360);
-        double newY = getPosition().getY() + 0.7 * Math.cos(Math.PI * 2 * getDirection().getY() / 360);
-        double newRotation;
-        if (clockwise) {
-            newRotation = getRotation() + 2;
-        } else {
-            newRotation = getRotation() - 2;
-        }
-        return new Asteroid(getId(),getType(),getShape(),getSize(),new Position(newX , newY) , getDirection(), getSpeed() , newRotation , getClockwise());
-    }
-    public boolean getClockwise(){
-        return clockwise;
-    }
-
-    @Override
-    public double getRotation() {
-        return rotation;
+    public int getDeathValue() {
+        return deathValue;
     }
 }
