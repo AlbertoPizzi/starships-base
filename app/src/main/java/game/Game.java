@@ -25,9 +25,8 @@ public class Game {
     public void newGame(){
         createPlayers();
         createAsteroids();
-        createBullets(50);
+        createBullets(5);
         fillEntities();
-
     }
     private void fillEntities(){
         entities = new ArrayList<>();

@@ -19,6 +19,7 @@ import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import movement.Position
+import java.awt.Label
 
 import kotlin.system.exitProcess
 
@@ -37,29 +38,29 @@ class Starships() : Application() {
         val Asteroid_IMAGE_REF = ImageRef("farquad", 80.0, 100.0)
         val BULLET_IMAGE_REF = ImageRef("shot" , BULLET_HEIGHT , BULLET_WIDTH)
         val game = Game()
-        val adapter = Adapter();
+        val adapter = Adapter()
+
     }
 
     override fun start(primaryStage: Stage) {
         val pane = gameScene()
-
+        val menu = menu(primaryStage , pane)
+        game.newGame()
         facade.timeListenable.addEventListener(TimeListener(facade.elements , game , this))
         facade.collisionsListenable.addEventListener(CollisionListener(game))
         keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(game , this , primaryStage , pane ))
         facade.showCollider.value = false;
 
 
-        val scene = Scene(facade.view)
-        keyTracker.scene = scene
+        keyTracker.scene = menu
 
-        primaryStage.scene = scene
+        primaryStage.scene = menu
         primaryStage.height = WINDOW_HEIGHT
         primaryStage.width = WINDOW_WIDTH
 
         facade.start()
         keyTracker.start()
         primaryStage.show()
-        game.start()
         createEntities()
 
     }
@@ -72,10 +73,18 @@ class Starships() : Application() {
     private fun gameScene(): StackPane {
         val pane = StackPane()
         val root = facade.view
-        root.id = "pane"
         pane.children.addAll(root )
+        root.id = "pane"
 
         return pane
+    }
+    private fun menu(primaryStage: Stage, pane: StackPane): Scene{
+        val verticalLayout = VBox(50.0)
+        verticalLayout.id = "menu"
+        verticalLayout.children
+        val menu = Scene(verticalLayout)
+        menu.stylesheets.add(this::class.java.classLoader.getResource("styles.css")?.toString())
+        return menu
     }
 
     private fun createEntities(){
@@ -100,7 +109,7 @@ class TimeListener(private val elements: Map<String, ElementModel> , private val
             starships.stop()
         }
         game.update()
-        val entities = game.entities ?: return;
+        val entities = game.entities ?: return
         for (entity in entities) {
             val element = elements.get(entity.id)
             val values = entity.posRotSz
